@@ -1,0 +1,22 @@
+{
+  "name": "oddity-db-api",
+  "version": "1.0.0",
+  "description": "An API for managing a MariaDB, designed for Oddity Network",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "IVelthoven",
+  "license": "ISC",
+  "dependencies": {
+    "bluebird": "^3.5.5",
+    "dotenv": "^8.1.0",
+    "install": "^0.13.0",
+    "mysql2": "^1.7.0",
+    "restify": "^8.4.0",
+    "restify-logger": "^2.0.1",
+    "restify-pino-logger": "^3.0.0"
+  }
+}
