@@ -29,7 +29,7 @@ module.exports = server => {
       });
   });
 
-  server.post("/portals", (req, res) => {
+  server.put("/portals", (req, res) => {
     if (!req.body) {
       return res.send(new err.BadRequestError("wrong input"));
     }
@@ -39,6 +39,23 @@ module.exports = server => {
     db.createPortal(name)
       .then(([accessKey, secretKey]) => {
         res.send({ accessKey: accessKey, secretKey: secretKey });
+      })
+      .catch(err => {
+        console.log(err);
+        res.send("something went wrong");
+      });
+  });
+
+  server.del("/portals", (req, res) => {
+    if (!req.body) {
+      return res.send(new err.BadRequestError("wrong input"));
+    }
+
+    const id = req.body.id;
+
+    db.removePortal(id)
+      .then(() => {
+        res.send("success");
       })
       .catch(err => {
         console.log(err);
