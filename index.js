@@ -1,10 +1,12 @@
 const restify = require("restify");
-const restifyLogger = require("restify-pino-logger");
+const restifyLogger = require("restify-logger");
 const routes = require("./routes");
 
 const PORT = process.env.PORT || 3000;
 
 const server = restify.createServer();
+
+server.use(restifyLogger("short"));
 
 server.use(
   restify.plugins.queryParser({

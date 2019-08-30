@@ -1,4 +1,5 @@
 const mysql = require("mysql2");
+const token = require("./token");
 
 require("dotenv").config();
 
@@ -16,18 +17,30 @@ class database {
     return this.execute("CREATE TABLE IF NOT EXISTS testing(test TEXT)");
   }
 
+  /**
+   * Users
+   */
   createUsersTable() {
     return this.execute(
-      "CREATE TABLE IF NOT EXISTS users(id MEDIUMINT NOT NULL AUTO_INCREMENT, username CHAR(30) NOT NULL, PRIMARY KEY (id))"
+      `CREATE TABLE IF NOT EXISTS 
+      users(
+        id MEDIUMINT NOT NULL AUTO_INCREMENT, 
+        username CHAR(30) NOT NULL, 
+        PRIMARY KEY (id)
+      )`
     );
   }
 
-  deleteUsersTable() {
+  removeUsersTable() {
     return this.execute("DROP TABLE IF EXISTS users");
   }
 
   createUser(username) {
     return this.query("INSERT INTO users (username) VALUES (?)", [username]);
+  }
+
+  removeUser(id) {
+    return this.query("DELETE FROM users WHERE id=?", [id]);
   }
 
   getUsers(id) {
@@ -38,6 +51,63 @@ class database {
     }
   }
 
+  /**
+   * Portals
+   */
+  createPortalsTable() {
+    return this.execute(`CREATE TABLE IF NOT EXISTS 
+    portals(
+      id MEDIUMINT NOT NULL AUTO_INCREMENT,
+      name CHAR(30) NOT NULL,
+      accessKey CHAR(30) NOT NULL,
+      secretKey CHAR(80) NOT NULL,
+      PRIMARY KEY (id)
+    )`);
+  }
+
+  removePortalTable() {
+    return this.execute("DROP TABLE IF EXISTS portals");
+  }
+
+  createPortal(name) {
+    return new Promise((res, rej) => {
+      let accessKey = token.createAccessKey();
+      let secretKey = token.createSecretKey();
+      token
+        .encryptKey(secretKey)
+        .then(hash => {
+          this.query(
+            "INSERT INTO portals (name, accessKey, secretKey) VALUES (?, ?, ?)",
+            [name, accessKey, hash]
+          )
+            .then(() => {
+              res([accessKey, secretKey]);
+            })
+            .catch(err => {
+              rej(err);
+            });
+        })
+        .catch(err => {
+          rej(err);
+        });
+    });
+  }
+
+  removePortal(id) {
+    return this.query("DELETE FROM portals WHERE id=?", [id]);
+  }
+
+  getPortals(id) {
+    if (id) {
+      return this.query("SELECT * FROM portals WHERE id=?", [id]);
+    } else {
+      return this.execute("SELECT * FROM portals;");
+    }
+  }
+
+  /**
+   * Helper functions
+   */
   execute(query) {
     return new Promise((res, rej) => {
       this.connection

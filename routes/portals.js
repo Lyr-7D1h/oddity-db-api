@@ -1,24 +1,25 @@
 const err = require("restify-errors");
 const db = require("../db");
 
-db.removeUsersTable()
+db.removePortalTable()
   .then(() => {
-    console.log("Removed Users Table");
+    console.log("Portal Table removed");
   })
   .catch(err => {
     console.log(err);
   });
-db.createUsersTable()
+
+db.createPortalsTable()
   .then(() => {
-    console.log("Created Users Table");
+    console.log("Portal Table created");
   })
   .catch(err => {
     console.log(err);
   });
 
 module.exports = server => {
-  server.get("/users/:id", (req, res) => {
-    db.getUsers(req.params.id)
+  server.get("/portals/:id", (req, res) => {
+    db.getPortals(req.params.id)
       .then(v => {
         res.send(v);
       })
@@ -28,16 +29,16 @@ module.exports = server => {
       });
   });
 
-  server.post("/users", (req, res) => {
+  server.post("/portals", (req, res) => {
     if (!req.body) {
       return res.send(new err.BadRequestError("wrong input"));
     }
 
-    const username = req.body.username;
+    const name = req.body.name;
 
-    db.createUser(username)
-      .then(v => {
-        res.send("success");
+    db.createPortal(name)
+      .then(([accessKey, secretKey]) => {
+        res.send({ accessKey: accessKey, secretKey: secretKey });
       })
       .catch(err => {
         console.log(err);

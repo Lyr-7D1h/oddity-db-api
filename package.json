@@ -11,12 +11,12 @@
   "author": "IVelthoven",
   "license": "ISC",
   "dependencies": {
-    "bluebird": "^3.5.5",
+    "bcrypt": "^3.0.6",
     "dotenv": "^8.1.0",
     "install": "^0.13.0",
     "mysql2": "^1.7.0",
     "restify": "^8.4.0",
-    "restify-logger": "^2.0.1",
-    "restify-pino-logger": "^3.0.0"
+    "restify-errors": "^8.0.1",
+    "restify-logger": "^2.0.1"
   }
 }
