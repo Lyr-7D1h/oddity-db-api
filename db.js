@@ -26,6 +26,10 @@ class database {
       users(
         id MEDIUMINT NOT NULL AUTO_INCREMENT, 
         username CHAR(30) NOT NULL, 
+        email CHAR(30) NOT NULL,
+        ip CHAR(30),
+        password CHAR(50) NOT NULL,
+        role CHAR(15) NOT NULL,
         PRIMARY KEY (id)
       )`
     );
@@ -35,8 +39,11 @@ class database {
     return this.execute("DROP TABLE IF EXISTS users");
   }
 
-  createUser(username) {
-    return this.query("INSERT INTO users (username) VALUES (?)", [username]);
+  createUser(username, email, password, role, ip) {
+    return this.query(
+      "INSERT INTO users (username, email, password, role, ip) VALUES (?, ?, ?, ?, ?)",
+      [username, email, password, role, ip]
+    );
   }
 
   removeUser(id) {
@@ -45,9 +52,12 @@ class database {
 
   getUsers(id) {
     if (id) {
-      return this.query("SELECT * FROM users WHERE id=?", [id]);
+      return this.query(
+        "SELECT id, username, email, role FROM users WHERE id=?",
+        [id]
+      );
     } else {
-      return this.execute("SELECT * FROM users;");
+      return this.execute("SELECT id, username, email, role FROM users;");
     }
   }
 
@@ -59,6 +69,7 @@ class database {
     portals(
       id MEDIUMINT NOT NULL AUTO_INCREMENT,
       name CHAR(30) NOT NULL,
+      url CHAR(30),
       accessKey CHAR(30) NOT NULL,
       secretKey CHAR(80) NOT NULL,
       PRIMARY KEY (id)
@@ -69,7 +80,7 @@ class database {
     return this.execute("DROP TABLE IF EXISTS portals");
   }
 
-  createPortal(name) {
+  createPortal(name, url) {
     return new Promise((res, rej) => {
       let accessKey = token.createAccessKey();
       let secretKey = token.createSecretKey();
@@ -77,8 +88,8 @@ class database {
         .encryptKey(secretKey)
         .then(hash => {
           this.query(
-            "INSERT INTO portals (name, accessKey, secretKey) VALUES (?, ?, ?)",
-            [name, accessKey, hash]
+            "INSERT INTO portals (name, url, accessKey, secretKey) VALUES (?, ?, ?, ?)",
+            [name, url, accessKey, hash]
           )
             .then(() => {
               res([accessKey, secretKey]);

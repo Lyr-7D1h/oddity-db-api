@@ -16,6 +16,7 @@
     "install": "^0.13.0",
     "mysql2": "^1.7.0",
     "restify": "^8.4.0",
+    "restify-cors-middleware": "^1.1.1",
     "restify-errors": "^8.0.1",
     "restify-logger": "^2.0.1"
   }

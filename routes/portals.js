@@ -1,13 +1,13 @@
 const err = require("restify-errors");
 const db = require("../db");
 
-db.removePortalTable()
-  .then(() => {
-    console.log("Portal Table removed");
-  })
-  .catch(err => {
-    console.log(err);
-  });
+// db.removePortalTable()
+//   .then(() => {
+//     console.log("Portal Table removed");
+//   })
+//   .catch(err => {
+//     console.log(err);
+//   });
 
 db.createPortalsTable()
   .then(() => {
@@ -35,8 +35,13 @@ module.exports = server => {
     }
 
     const name = req.body.name;
+    const url = req.body.url;
 
-    db.createPortal(name)
+    if (!name) {
+      return res.send(new err.BadRequestError("wrong input"));
+    }
+
+    db.createPortal(name, url)
       .then(([accessKey, secretKey]) => {
         res.send({ accessKey: accessKey, secretKey: secretKey });
       })
@@ -53,13 +58,20 @@ module.exports = server => {
 
     const id = req.body.id;
 
-    db.removePortal(id)
-      .then(() => {
-        res.send("success");
-      })
-      .catch(err => {
-        console.log(err);
-        res.send("something went wrong");
-      });
+    if (id) {
+      db.removePortal(id)
+        .then(v => {
+          if (v.affectedRows == 0) {
+            return res.send("nothing changed");
+          }
+          res.send("success");
+        })
+        .catch(err => {
+          console.log(err);
+          res.send("something went wrong");
+        });
+    } else {
+      return res.send(new err.BadRequestError("wrong input"));
+    }
   });
 };

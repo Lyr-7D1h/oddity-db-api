@@ -28,20 +28,57 @@ module.exports = server => {
       });
   });
 
-  server.post("/users", (req, res) => {
+  server.put("/users", (req, res) => {
     if (!req.body) {
       return res.send(new err.BadRequestError("wrong input"));
     }
 
     const username = req.body.username;
+    const email = req.body.email;
+    const password = req.body.password;
+    const role = req.body.role;
+    const ip = req.body.ip;
 
-    db.createUser(username)
-      .then(v => {
-        res.send("success");
-      })
-      .catch(err => {
-        console.log(err);
-        res.send("something went wrong");
-      });
+    if (username && email && password && role && ip) {
+      db.createUser(username, email, password, role, ip)
+        .then(v => {
+          if (v.affectedRows == 0) {
+            return res.send("nothing changed");
+          }
+          res.send("success");
+        })
+        .catch(err => {
+          console.log(err);
+          res.send("something went wrong");
+        });
+    } else {
+      return res.send(
+        new err.BadRequestError("not all properties needed given")
+      );
+    }
+  });
+
+  server.del("/users", (req, res) => {
+    if (!req.body) {
+      return res.send(new err.BadRequestError("wrong input"));
+    }
+
+    const id = req.body.id;
+
+    if (id) {
+      db.removeUser(id)
+        .then(v => {
+          if (v.affectedRows == 0) {
+            return res.send("nothing changed");
+          }
+          return res.send("success");
+        })
+        .catch(err => {
+          console.log(err);
+          return res.send("something went wrong");
+        });
+    } else {
+      return res.send(new err.BadRequestError("wrong input"));
+    }
   });
 };
